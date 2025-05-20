@@ -95,33 +95,51 @@
 
   <?php }
   if (!empty($_POST['birthday'])) { ?>
-    <div class="container countdown">
-      <div id="years" class="clock_bg">
-        <div class="clock_counter"><?php echo $interval->y; ?></div>
-        <div class="clock_label">années</div>
-      </div>
-      <div id="months" class="clock_bg">
-        <div class="clock_counter"><?php echo $interval->m; ?></div>
-        <div class="clock_label">mois</div>
-      </div>
-      <div id="days" class="clock_bg">
-        <div class="clock_counter"><?php echo $interval->d; ?></div>
-        <div class="clock_label">jours</div>
-      </div>
-      <div id="hours" class="clock_bg">
-        <div class="clock_counter"><?php echo $interval->h; ?></div>
-        <div class="clock_label">heures</div>
-      </div>
-      <div id="minutes" class="clock_bg">
-        <div class="clock_counter"><?php echo $interval->i; ?></div>
-        <div class="clock_label">minutes</div>
-      </div>
-      <div id="seconds" class="clock_bg">
-        <div class="clock_counter"><?php echo $interval->s; ?></div>
-        <div class="clock_label">secondes</div>
-      </div>
+    <p>Vous êtes agé de :</p>
+    <div class="container elapsedTime">
+      <?php
+      $counter = ['années' => $interval->y, 'mois' => $interval->m, 'jours' => $interval->d, 'heures' => $interval->h, 'minutes' => $interval->i, 'secondes' => $interval->s];
+
+      foreach ($counter as $key => $value) {
+        if ($value > 0) {
+          echo "
+          <div class='clock_bg'>
+            <div class='clock_counter' id='$key-counter'>$value</div>
+            <div class='clock_label'>$key</div>
+          </div>";
+        }
+      } ?>
     </div>
-  <?php } ?>
+
+  <?php
+    // Calculer le nombre d'année, mois, jours, heures, minutes et secondes entiers
+    $years = $interval->y;
+    $months = $years * 12 + $interval->m;
+    // Prise en comptes des années bissextiles
+    $days = $years * 365 + $interval->d + (intdiv($years, 4) - intdiv($years, 100) + intdiv($years, 400));
+    $hours = $days * 24 + $interval->h;
+    $minutes = $hours * 60 + $interval->i;
+    $seconds = $minutes * 60 + $interval->s;
+
+    $counterFull = ['années entières' => $years, 'mois entiers' => $months, 'jours entiers' => $days, 'heures entières' => $hours, 'minutes entières' => $minutes, 'secondes entières' => $seconds];
+    $label = ['Soit', 'Ou encore', 'Mais aussi', 'Ainsi que', 'En somme', 'Et de surcroît'];
+    $i = 0;
+    foreach ($counterFull as $key => $value) {
+      if ($value > 0) {
+        // affiches juste le nom de la clé mais juste le premier mot
+        $keyFirst = explode(' ', $key)[0];
+        echo "
+        <p class='oneUnitTime'>{$label[$i]} : </p>
+        <div class='container elapsedTime'>
+          <div class='clock_bg alone'>
+            <div class='clock_counter' id='$keyFirst-counter-full'>" . number_format($value, 0, '', ' ') . "</div>
+            <div class='clock_label'>$key</div>
+          </div>
+        </div>";
+        $i++;
+      }
+    }
+  } ?>
 
 </body>
 
